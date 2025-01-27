@@ -9,21 +9,30 @@ from ship import Ship
 class Battleships:
     def __init__(self):
         pygame.init()
+        self.DEBUG = False
         self.settings = Settings()
         self.reset_game()
 
     def reset_game(self):
         """ Resetuje wszystkie zmienne do początkowego stanu """
-        self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
+        self.screen = pygame.display.set_mode((
+            self.settings.screen_width, self.settings.screen_height
+        ))
         pygame.display.set_caption("Statki")
 
         self.bg_color = self.settings.darkblue
-        self.grid = [[0] * self.settings.grid_size for _ in range(self.settings.grid_size)]
+        self.grid = [
+            [0] * self.settings.grid_size for _ in range(self.settings.grid_size)
+        ]
         self.attempts = 0  
         self.ships = self.place_ships()
         
-        total_grid_width = self.settings.grid_size * (self.settings.cell_size + self.settings.margin)
-        total_grid_height = self.settings.grid_size * (self.settings.cell_size + self.settings.margin)
+        total_grid_width = self.settings.grid_size * (
+            self.settings.cell_size + self.settings.margin
+        )
+        total_grid_height = self.settings.grid_size * (
+            self.settings.cell_size + self.settings.margin
+        )
         self.offset_x = (self.settings.screen_width - total_grid_width) // 2
         self.offset_y = (self.settings.screen_height - total_grid_height) // 2 + 20
         self.game_over = False
@@ -48,7 +57,8 @@ class Battleships:
                     else:
                         ship_cells.append((x, y + i))
 
-                if any(cx >= self.settings.grid_size or cy >= self.settings.grid_size for cx, cy in ship_cells):
+                if any(cx >= self.settings.grid_size or cy >= self.settings.grid_size 
+                       for cx, cy in ship_cells):
                     continue
 
                 if not self.check_collision(ship_cells):
@@ -82,8 +92,11 @@ class Battleships:
     def show_start_screen(self):
         """Wyświetla ekran startowy"""
         font = pygame.font.Font(None, 72)
+        name_text = font.render("Battleships", True, self.settings.green)
         start_text = font.render("Start Game", True, self.settings.white)
-        instructions_text = pygame.font.Font(None, 36).render("Click to Start", True, self.settings.white)
+        instructions_text = pygame.font.Font(None, 36).render(
+            "Click to Start", True, self.settings.white
+        )
 
         button_width = 300
         button_height = 80
@@ -100,8 +113,20 @@ class Battleships:
         waiting_for_click = True
         while waiting_for_click:
             self.screen.fill(self.bg_color)
+            self.screen.blit(
+                name_text, (
+                    self.settings.screen_width // 2 - name_text.get_width() // 2, 
+                    self.settings.screen_height // 2 - button_height // 2 - 
+                    name_text.get_height() // 2 - 40
+                )
+            )
             start_button.draw()
-            self.screen.blit(instructions_text, (self.settings.screen_width // 2 - instructions_text.get_width() // 2, self.settings.screen_height // 2 + button_height // 2 + 10))
+            self.screen.blit(
+                instructions_text, (
+                    self.settings.screen_width // 2 - instructions_text.get_width() // 2,
+                    self.settings.screen_height // 2 + button_height // 2 + 10
+                )
+            )
             pygame.display.flip()
 
             for event in pygame.event.get():
@@ -117,9 +142,13 @@ class Battleships:
         victory_text = font.render("You Win!", True, self.settings.green)
 
         if self.attempts == 1:
-            victory_text2 = font2.render(f"You missed {self.attempts} time", True, self.settings.darkgreen)
+            victory_text2 = font2.render(
+                f"You missed {self.attempts} time", True, self.settings.darkgreen
+            )
         else:
-            victory_text2 = font2.render(f"You missed {self.attempts} times", True, self.settings.darkgreen)
+            victory_text2 = font2.render(
+                f"You missed {self.attempts} times", True, self.settings.darkgreen
+            )
 
         button_width = 300
         button_height = 80
@@ -134,8 +163,18 @@ class Battleships:
         )
 
         self.screen.fill(self.bg_color)
-        self.screen.blit(victory_text, (self.settings.screen_width // 2 - victory_text.get_width() // 2, self.settings.screen_height // 2 - victory_text.get_height() // 2))
-        self.screen.blit(victory_text2, (self.settings.screen_width // 2 - victory_text2.get_width() // 2, self.settings.screen_height // 2 + victory_text2.get_height() + 10 // 2))
+        self.screen.blit(
+            victory_text, (
+                self.settings.screen_width // 2 - victory_text.get_width() // 2, 
+                self.settings.screen_height // 2 - victory_text.get_height() // 2
+            )
+        )
+        self.screen.blit(
+            victory_text2, (
+                self.settings.screen_width // 2 - victory_text2.get_width() // 2, 
+                self.settings.screen_height // 2 + victory_text2.get_height() + 10 // 2
+            )
+        )
 
         play_again_button.draw()
         pygame.display.flip()
@@ -158,8 +197,6 @@ class Battleships:
                 x, y = event.pos
                 self.check_guess(x, y)
                 
-                  
-
     def check_guess(self, x, y):
         col = (x - self.offset_x) // (self.settings.cell_size + self.settings.margin)
         row = (y - self.offset_y) // (self.settings.cell_size + self.settings.margin)
@@ -179,36 +216,59 @@ class Battleships:
         """ Rysowanie planszy na środku ekranu """
         #Cyfry
         font = pygame.font.Font(None, 30)
-        for row in range(self.settings.grid_size): #grid size to 10
+        for row in range(self.settings.grid_size): 
             text = font.render(str(row + 1), True, self.settings.white)
-            self.screen.blit(text, (self.offset_x - 30, self.offset_y + (self.settings.cell_size + self.settings.margin) * row + self.settings.cell_size // 2 - text.get_height() // 2))
+            self.screen.blit(
+                text, (
+                    self.offset_x - 30, 
+                    self.offset_y + (self.settings.cell_size + self.settings.margin) * row + 
+                    self.settings.cell_size // 2 - text.get_height() // 2
+                )
+            )
 
         # Litery
         for col in range(self.settings.grid_size):
             letter = chr(65 + col)  # 65 to A
             text = font.render(letter, True, self.settings.white)
-            self.screen.blit(text, (self.offset_x + (self.settings.cell_size + self.settings.margin) * col + self.settings.cell_size // 2 - text.get_width() // 2, self.offset_y - 30))
+            self.screen.blit(
+                text, (
+                    self.offset_x + (self.settings.cell_size + self.settings.margin) * col + 
+                    self.settings.cell_size // 2 - text.get_width() // 2, 
+                    self.offset_y - 30
+                )
+            )
 
         # Okienka
         for row in range(self.settings.grid_size):
             for col in range(self.settings.grid_size):
                 cell_value = self.grid[row][col]
                 color = self.get_cell_color(cell_value)
-                pygame.draw.rect(self.screen, color,
-                                 [self.offset_x + (self.settings.cell_size + self.settings.margin) * col,
-                                  self.offset_y + (self.settings.cell_size + self.settings.margin) * row,
-                                  self.settings.cell_size, self.settings.cell_size])
-                pygame.draw.rect(self.screen, self.settings.black,
-                                 [self.offset_x + (self.settings.cell_size + self.settings.margin) * col,
-                                  self.offset_y + (self.settings.cell_size + self.settings.margin) * row,
-                                  self.settings.cell_size, self.settings.cell_size], 1)
+                pygame.draw.rect(
+                    self.screen, color,
+                    [
+                        self.offset_x + (self.settings.cell_size + self.settings.margin) * col,
+                        self.offset_y + (self.settings.cell_size + self.settings.margin) * row,
+                        self.settings.cell_size, self.settings.cell_size
+                    ]
+                )
+                pygame.draw.rect(
+                    self.screen, self.settings.black,
+                    [
+                        self.offset_x + (self.settings.cell_size + self.settings.margin) * col,
+                        self.offset_y + (self.settings.cell_size + self.settings.margin) * row,
+                        self.settings.cell_size, self.settings.cell_size
+                    ], 1
+                )
 
     def get_cell_color(self, cell_value):
         """ Zwraca odpowiedni kolor dla danej komórki """
         if cell_value == 0:
             return self.settings.blue  # Woda
         elif cell_value == 1:
-            return self.settings.gray  # Statek
+            if self.DEBUG: 
+                return self.settings.gray
+            else:
+                return self.settings.blue # Statek
         elif cell_value == 2:
             return self.settings.red  # Trafiony statek
         elif cell_value == 3:
